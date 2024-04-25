@@ -1,0 +1,68 @@
+Almost out of storage … If you run out, you can't create, edit and upload files.
+#Practical 1: CDMA
+import numpy as np
+c1 = [1,1,1,1]
+c2 = [1,-1,1,-1]
+c3 = [1, 1, -1, -1]
+c4 = [1,-1,-1,1]
+r = []
+print("Enter Sender Data: ")
+d1 = int(input("Enter D1: "))
+d2 = int(input("Enter D2: "))
+d3 = int(input("Enter D3: "))
+d4 = int(input("Enter D4: "))
+t1 = np.multiply(c1,d1)
+t2 = np.multiply(c2,d2)
+t3 = np.multiply(c3,d3)
+t4 = np.multiply(c4,d4)
+rc = t1 + t2 + t3 + t4
+print("Resultant Channel: ", rc)
+while True:
+    print("Enter Channel: ")
+    channel = int(input("1: C1\n2: C2\n3: C3\n4: C4\n"))
+    if channel == 1:
+        r = c1
+    elif channel == 2:
+        r = c2
+    elif channel == 3:
+        r = c3
+    elif channel == 4:
+        r = c4
+    else:
+        print("Please Enter Valid Channel")
+    product = np.multiply(rc,r)
+    print("Product: ", product)
+    sop = sum(product)
+    rd = sop/len(product)
+    print("Received Data: ", rd)
+
+-----
+
+#Practical 4: BER
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.special import erfc
+np.random.seed(100) 
+N = 10**6 
+# Transmitter
+ip = np.random.rand(N) > 0.5 
+s = 2 * ip - 1 # BPSK modulation 0 -> -1; 1 -> 1
+n = (1/np.sqrt(2)) * (np.random.randn(N) + 1j * np.random.randn(N)) 
+Eb_N0_dB = np.arange(-3, 11) 
+nErr = np.zeros(len(Eb_N0_dB))
+for ii in range(len(Eb_N0_dB)):
+  y = s + 10**(-Eb_N0_dB[ii] / 20) * n 
+  ipHat = np.real(y) > 0
+  nErr[ii] = np.sum(ip != ipHat)
+simBer = nErr / N 
+theoryBer = 0.5 * erfc(np.sqrt(10**(Eb_N0_dB / 10))) 
+plt.figure()
+plt.semilogy(Eb_N0_dB, theoryBer, 'b.-')
+plt.semilogy(Eb_N0_dB, simBer, 'mx-')
+plt.axis([-3, 10, 10**-5, 0.5])
+plt.grid(True)
+plt.legend(['Theory', 'Simulation'])
+plt.xlabel('Eb/No, dB')
+plt.ylabel('Bit Error Rate')
+plt.title('Bit error probability curve for BPSK modulation')
+plt.show()
